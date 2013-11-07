@@ -2,6 +2,7 @@
 __version__ = "1.0.0"
 
 import argparse
+import getpass
 import os
 import subprocess
 
@@ -23,8 +24,6 @@ def setup_args(parser=None):
 	parser.add_argument('-k', '--keystore', dest='keystore_loc',
 		help='Path to the java keystore to update.',
 		required=True)
-	parser.add_argument('-p', '--keystore-password', dest='key_pass',
-		help='Keystore password')
 	args = parser.parse_args()
 	return args
 
@@ -62,13 +61,14 @@ def main(args):
 	if args.working_dir:
 		os.chdir(args.working_dir)
 		cert_dir = os.path.join(args.working_dir, cert_dir)
+	store_passwd = getpass.getpass('Enter the keystore password:')
 	download_url_to_file(go_extract_script_url,
 		'convert_mozilla_certdata.go')
 	download_url_to_file(args.mozilla_cert_url, 'certdata.txt')
 	go_command = ['go', 'run',  '../convert_mozilla_certdata.go',
 		'-to-files', '../certdata.txt']
 	extract_certs_to_files(go_command, cert_dir)
-	import_ca_certs_to_keystore(args.keystore_loc, args.key_pass, cert_dir)
+	import_ca_certs_to_keystore(args.keystore_loc, store_passwd, cert_dir)
 
 
 if __name__=='__main__':
