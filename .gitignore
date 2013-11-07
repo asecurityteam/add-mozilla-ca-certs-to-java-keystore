@@ -1,0 +1,6 @@
+*.pyc
+*.pyo
+convert_mozilla_certdata.go
+certdata.txt
+certdata.new
+certificates/
