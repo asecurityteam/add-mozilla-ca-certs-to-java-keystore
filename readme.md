@@ -17,7 +17,7 @@ Here is an example of using the `add_mozilla_ca_certs_to_java_keystore` script
 
     python add_mozilla_ca_certs_to_java_keystore.py  -w . -k $JAVA_HOME/jre/lib/security/cacerts
 
-#### Help
+###### Help
 Help information for the `add_mozilla_ca_certs_to_java_keystore.py`
 script can be obtained by running `python add_mozilla_ca_certs_to_java_keystore.py -h`
 as shown below.
