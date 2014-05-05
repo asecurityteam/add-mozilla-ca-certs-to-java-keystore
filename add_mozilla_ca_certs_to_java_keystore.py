@@ -54,6 +54,13 @@ def import_ca_certs_to_keystore(keystore_loc, store_passwd, cert_dir):
 		subprocess.Popen(command).communicate()
 
 
+def check_requirements():
+	try:
+		subprocess.call(['go', 'version'], stdout=subprocess.PIPE)
+	except OSError:
+		raise SystemError('go is not installed')
+
+
 def main(args):
 	go_extract_script_url = ('https://raw.github.com/agl/extract-nss-root-certs/'
 		'master/convert_mozilla_certdata.go')
@@ -61,6 +68,7 @@ def main(args):
 	if args.working_dir:
 		os.chdir(args.working_dir)
 		cert_dir = os.path.join(args.working_dir, cert_dir)
+	check_requirements()
 	store_passwd = getpass.getpass('Enter the keystore password:')
 	download_url_to_file(go_extract_script_url,
 		'convert_mozilla_certdata.go')
