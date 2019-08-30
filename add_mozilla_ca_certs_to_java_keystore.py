@@ -5,6 +5,7 @@ import os
 import subprocess
 
 import requests
+import sys
 
 __version__ = "1.0.0"
 
@@ -72,7 +73,10 @@ def main(args):
         os.chdir(args.working_dir)
         cert_dir = os.path.join(args.working_dir, cert_dir)
     check_requirements()
-    store_passwd = getpass.getpass('Enter the keystore password:')
+    if sys.stdin.isatty():
+        store_passwd = getpass.getpass('Enter the keystore password:')
+    else:
+        store_passwd = sys.stdin.readline().rstrip()
     download_url_to_file(go_extract_script_url,
                          'convert_mozilla_certdata.go')
     download_url_to_file(args.mozilla_cert_url, 'certdata.txt')
