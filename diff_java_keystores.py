@@ -25,18 +25,22 @@ def setup_args(parser=None):
 def keystore_output_to_get_entries(lines):
     sha_to_alias_mapping = {}
     current_alias = None
-    sha1_text = 'Certificate fingerprint (SHA1):'
+    sha_text = 'Certificate fingerprint (%s):'
+    sha1_text = sha_text % 'SHA1'
+    sha256_text = sha_text % 'SHA-256'
     for line in lines:
-        line = line.decode('utf-8', errors='ignore')
         if current_alias is None and 'trustedCertEntry' not in line:
             continue
         if 'trustedCertEntry' in line:
             if current_alias is not None:
                 raise ValueError('unexpected trustedCertEntry line!')
             current_alias = line.strip()
-        elif current_alias and sha1_text in line:
-            sha1 = line.split(sha1_text)[-1].strip()
-            sha_to_alias_mapping[sha1] = current_alias
+        elif current_alias and (sha1_text in line or sha256_text in line):
+            if sha1_text in line:
+                sha = line.split(sha1_text)[-1].strip()
+            else:
+                sha = line.split(sha256_text)[-1].strip()
+            sha_to_alias_mapping[sha] = current_alias
             current_alias = None
     return sha_to_alias_mapping
 
@@ -49,8 +53,9 @@ def list_keys_in_keystore(path_to_keystore, password):
     ]
     process = subprocess.Popen(command, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate(password + os.linesep)
-    return stdout.split(os.linesep)
+    stdout, stderr = process.communicate(
+        (password + os.linesep).encode('utf-8'))
+    return stdout.decode('utf-8').split(os.linesep)
 
 
 def main(args):
